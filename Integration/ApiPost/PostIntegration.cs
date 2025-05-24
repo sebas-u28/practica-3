@@ -45,5 +45,39 @@ namespace practica.Integration.Exchange
                 return new List<Post>();
             }
         }
+
+        public async Task<User?> GetUserByIdAsync(int id)
+        {
+            var url = $"https://jsonplaceholder.typicode.com/users/{id}";
+            using var httpClient = new HttpClient();
+
+            try
+            {
+                _logger.LogInformation("Fetching user from {Url}", url);
+                var response = await httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var user = JsonSerializer.Deserialize<User>(json, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    _logger.LogInformation("Successfully fetched user with ID {Id}", id);
+                    return user;
+                }
+                else
+                {
+                    _logger.LogError("Failed to fetch user. Status code: {StatusCode}", response.StatusCode);
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred while fetching user");
+                return null;
+            }
+        }
     }
 }
