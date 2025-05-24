@@ -1,10 +1,10 @@
-﻿@model List<practica.Integration.Exchange.Post>
-
-<h2>Listado de Títulos de Posts</h2>
-
-<ul>
+﻿<ul>
 @foreach (var post in Model)
 {
-    <li>@post.Title</li>
+    <li>
+        <a href="@Url.Action("PostDetail", "Home", new { id = post.Id })" target="_blank">
+            @post.Title
+        </a>
+    </li>
 }
 </ul>

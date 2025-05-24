@@ -1,0 +1,34 @@
+@model practica.Models.PostDetailViewModel
+
+<h2>@Model.Post.Title</h2>
+<p>@Model.Post.Body</p>
+
+<h3>Autor</h3>
+@if (Model.User != null)
+{ 
+    <p><strong>Nombre:</strong> @Model.User.Name</p>
+    <p><strong>Email:</strong> @Model.User.Email</p>
+    <p><strong>Username:</strong> @Model.User.Username</p>
+}
+else
+{
+    <p>No se encontró el usuario.</p>
+}
+
+<h3>Comentarios</h3>
+@if (Model.Comments.Count > 0)
+{
+    <ul>
+    @foreach (var comment in Model.Comments)
+    {
+        <li>
+            <strong>@comment.Name</strong> (<em>@comment.Email</em>):<br />
+            @comment.Body
+        </li>
+    }
+    </ul>
+}
+else
+{
+    <p>No hay comentarios para este post.</p>
+}

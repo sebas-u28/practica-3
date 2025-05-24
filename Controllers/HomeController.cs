@@ -23,6 +23,27 @@ public async Task<IActionResult> Index()
     return View(posts);
 }
 
+public async Task<IActionResult> PostDetail(int id)
+{
+    var posts = await _postIntegration.GetAllPostsAsync();
+    var post = posts.FirstOrDefault(p => p.Id == id);
+
+    if (post == null)
+        return NotFound();
+
+    var user = await _postIntegration.GetUserByIdAsync(post.UserId);
+    var comments = await _postIntegration.GetCommentsByPostIdAsync(id);
+
+    var viewModel = new PostDetailViewModel
+    {
+        Post = post,
+        User = user,
+        Comments = comments
+    };
+
+    return View(viewModel);
+}
+
 
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
