@@ -1,0 +1,32 @@
+@model List<practica.Models.Feedback>
+
+<h1>@ViewData["Title"]</h1>
+
+<p>Feedback count: @(Model?.Count ?? 0)</p>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No hay feedbacks disponibles.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>PostId</th>
+                <th>Sentimiento</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var feedback in Model)
+            {
+                <tr>
+                    <td>@feedback.PostId</td>
+                    <td>@feedback.Sentimiento</td>
+                    <td>@feedback.Fecha.ToLocalTime().ToString("g")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

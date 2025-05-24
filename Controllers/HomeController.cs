@@ -89,6 +89,14 @@ public async Task<IActionResult> SendFeedback(int postId, string sentimiento)
 
     return RedirectToAction(nameof(PostDetail), new { id = postId });
 }
+public async Task<IActionResult> Feedbacks()
+{
+    var feedbacks = await _feedbackIntegration.GetAllFeedbacksAsync();
+
+    _logger.LogInformation("Número de feedbacks para la vista: {Count}", feedbacks.Count);
+
+    return View(feedbacks);
+}
 
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
