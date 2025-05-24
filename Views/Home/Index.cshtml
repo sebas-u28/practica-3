@@ -1,10 +1,13 @@
-﻿<ul>
-@foreach (var post in Model)
-{
-    <li>
-        <a href="@Url.Action("PostDetail", "Home", new { id = post.Id })" target="_blank">
-            @post.Title
-        </a>
-    </li>
-}
-</ul>
+﻿<div class="container mt-4">
+    <h3>Lista de Publicaciones</h3>
+    <ul class="list-group">
+        @foreach (var post in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="@Url.Action("PostDetail", "Home", new { id = post.Id })" target="_blank" class="text-decoration-none">
+                    @post.Title
+                </a>
+            </li>
+        }
+    </ul>
+</div>

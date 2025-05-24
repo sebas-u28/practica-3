@@ -1,34 +1,52 @@
 @model practica.Models.PostDetailViewModel
 
-<h2>@Model.Post.Title</h2>
-<p>@Model.Post.Body</p>
+<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+    <h2 style="color: #2c3e50;">@Model.Post.Title</h2>
+    <p style="font-size: 1.1em; color: #555;">@Model.Post.Body</p>
 
-<h3>Autor</h3>
-@if (Model.User != null)
-{ 
-    <p><strong>Nombre:</strong> @Model.User.Name</p>
-    <p><strong>Email:</strong> @Model.User.Email</p>
-    <p><strong>Username:</strong> @Model.User.Username</p>
-}
-else
-{
-    <p>No se encontró el usuario.</p>
-}
+    <hr />
 
-<h3>Comentarios</h3>
-@if (Model.Comments.Count > 0)
-{
-    <ul>
-    @foreach (var comment in Model.Comments)
+    <h3 style="color: #34495e;">Autor</h3>
+    @if (Model.User != null)
     {
-        <li>
-            <strong>@comment.Name</strong> (<em>@comment.Email</em>):<br />
-            @comment.Body
-        </li>
+        <div style="padding-left: 10px;">
+            <p><strong>Nombre:</strong> @Model.User.Name</p>
+            <p><strong>Email:</strong> @Model.User.Email</p>
+            <p><strong>Username:</strong> @Model.User.Username</p>
+        </div>
     }
-    </ul>
-}
-else
-{
-    <p>No hay comentarios para este post.</p>
-}
+    else
+    {
+        <p style="color: #c0392b;">No se encontró el usuario.</p>
+    }
+
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button style="padding: 10px 20px; background-color: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            👍 Me gustó
+        </button>
+        <button style="padding: 10px 20px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            👎 No me gustó
+        </button>
+    </div>
+    <hr />
+
+    <h3 style="color: #34495e;">Comentarios</h3>
+    @if (Model.Comments.Count > 0)
+    {
+        <ul style="list-style: none; padding: 0;">
+            @foreach (var comment in Model.Comments)
+            {
+                <li style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+                    <strong>@comment.Name</strong> <em>(@comment.Email)</em><br />
+                    <span style="color: #555;">@comment.Body</span>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No hay comentarios para este post.</p>
+    }
+
+    <hr />
+</div>
