@@ -79,5 +79,39 @@ namespace practica.Integration.Exchange
                 return null;
             }
         }
+        public async Task<List<Comment>> GetCommentsByPostIdAsync(int postId)
+        {
+            var url = $"https://jsonplaceholder.typicode.com/comments?postId={postId}";
+            using var httpClient = new HttpClient();
+
+            try
+            {
+                _logger.LogInformation("Fetching comments for post ID {PostId} from {Url}", postId, url);
+                var response = await httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var comments = JsonSerializer.Deserialize<List<Comment>>(json, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    _logger.LogInformation("Fetched {Count} comments for post ID {PostId}", comments?.Count ?? 0, postId);
+                    return comments ?? new List<Comment>();
+                }
+                else
+                {
+                    _logger.LogError("Failed to fetch comments. Status code: {StatusCode}", response.StatusCode);
+                    return new List<Comment>();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred while fetching comments for post ID {PostId}", postId);
+                return new List<Comment>();
+            }
+        }
+
     }
 }
