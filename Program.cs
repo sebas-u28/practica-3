@@ -7,7 +7,9 @@ using practica.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Obtén la URL base desde configuración
+var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"];
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
@@ -21,8 +23,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient(); 
 
 builder.Services.AddScoped<PostIntegration>();
-builder.Services.AddScoped<FeedbackIntegration, FeedbackIntegration>();
+builder.Services.AddScoped<FeedbackIntegration>();
 builder.Services.AddScoped<FeedbackService>();
+
+// Configura HttpClient para FeedbackIntegration usando la URL desde appsettings.json
+builder.Services.AddHttpClient<FeedbackIntegration>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+});
 
 var app = builder.Build();
 
