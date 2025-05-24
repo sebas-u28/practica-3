@@ -72,5 +72,11 @@ namespace practica.Service
             _logger.LogInformation("Updated feedback for PostId {PostId} in the database.", feedback.PostId);
             return true;
         }
+public async Task<bool> FeedbackExistsAsync(int postId)
+{
+    return await _context.DbSetFeedback.AnyAsync(f => f.PostId == postId);
+}
+
+
     }
 }

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using practica.Integration.Exchange;
 using practica.Integration;
@@ -49,30 +50,45 @@ public class HomeController : Controller
         return View(viewModel);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> SendFeedback(int postId, string sentimiento)
+[HttpPost]
+public async Task<IActionResult> SendFeedback(int postId, string sentimiento)
+{
+    if (!Enum.TryParse<SentimientoTipo>(sentimiento, true, out var sentimientoEnum))
     {
-        if (!Enum.TryParse<SentimientoTipo>(sentimiento, true, out var sentimientoEnum))
-        {
-            return BadRequest("Sentimiento inválido.");
-        }
-
-        var feedback = new Feedback
-        {
-            PostId = postId,
-            Sentimiento = sentimientoEnum,
-            Fecha = DateTime.UtcNow
-        };
-
-        bool result = await _feedbackIntegration.PostFeedbackAsync(feedback);
-
-        if (!result)
-        {
-            TempData["ErrorMessage"] = "No se pudo enviar el feedback.";
-        }
-
+        TempData["ErrorMessage"] = "Sentimiento inválido.";
         return RedirectToAction(nameof(PostDetail), new { id = postId });
     }
+
+    // Ya no validamos userId porque no existe
+
+    // Verifica si ya existe feedback para este post (sin usuario)
+    bool yaExiste = await _feedbackIntegration.FeedbackExistsAsync(postId);
+    if (yaExiste)
+    {
+        TempData["ErrorMessage"] = "Ya se ha enviado feedback para este post.";
+        return RedirectToAction(nameof(PostDetail), new { id = postId });
+    }
+
+    var feedback = new Feedback
+    {
+        PostId = postId,
+        Sentimiento = sentimientoEnum,
+        Fecha = DateTime.UtcNow,
+    };
+
+    bool result = await _feedbackIntegration.PostFeedbackAsync(feedback);
+
+    if (!result)
+    {
+        TempData["ErrorMessage"] = "No se pudo enviar el feedback.";
+    }
+    else
+    {
+        TempData["SuccessMessage"] = "Gracias por tu opinión.";
+    }
+
+    return RedirectToAction(nameof(PostDetail), new { id = postId });
+}
 
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

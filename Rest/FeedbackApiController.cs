@@ -1,59 +1,49 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using practica.Data;
 using practica.Models;
-using practica.Service;
 
-namespace practica.Rest
+namespace practica.Controllers.Api
 {
     [ApiController]
-    [Route("api/feedback")]
-    public class FeedbackApiController : ControllerBase
+    [Route("api/[controller]")]
+    public class FeedbackController : ControllerBase
     {
-        private readonly FeedbackService _feedbackService;
+        private readonly ApplicationDbContext _context;
 
-        public FeedbackApiController(FeedbackService feedbackService)
+        public FeedbackController(ApplicationDbContext context)
         {
-            _feedbackService = feedbackService;
+            _context = context;
         }
 
-        // GET api/feedback
+        // GET: api/feedback
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<Feedback>>> List()
+        public async Task<ActionResult<IEnumerable<Feedback>>> GetAll()
         {
-            var feedbacks = await _feedbackService.GetAll();
-            if (feedbacks == null || feedbacks.Count == 0)
-                return NotFound();
-            return Ok(feedbacks);
+            return await _context.DbSetFeedback.ToListAsync();
         }
 
-        // GET api/feedback/{postId}
-        [HttpGet("{postId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<Feedback>>> GetByPostId(int postId)
+        // GET: api/feedback/exist/5
+        [HttpGet("exist/{postId}")]
+        public async Task<ActionResult<bool>> FeedbackExists(int postId)
         {
-            var feedbacks = await _feedbackService.GetByPostId(postId);
-                return NotFound();
-            return Ok(feedbacks);
+            var exists = await _context.DbSetFeedback.AnyAsync(f => f.PostId == postId);
+            return Ok(exists);
         }
 
-        // POST api/feedback
+        // POST: api/feedback
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Feedback>> Create([FromBody] Feedback feedback)
+        public async Task<IActionResult> PostFeedback([FromBody] Feedback feedback)
         {
-            if (feedback == null)
-                return BadRequest("Invalid feedback data.");
+            if (await _context.DbSetFeedback.AnyAsync(f => f.PostId == feedback.PostId))
+            {
+                return BadRequest("Ya existe feedback para este post.");
+            }
 
-            var result = await _feedbackService.Add(feedback);
-            if (!result)
-                return BadRequest("Failed to add feedback.");
+            _context.DbSetFeedback.Add(feedback);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetByPostId), new { postId = feedback.PostId }, feedback);
+            return Ok();
         }
     }
 }

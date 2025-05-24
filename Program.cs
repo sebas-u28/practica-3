@@ -3,13 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using practica.Data;
 using practica.Integration;
 using practica.Integration.Exchange;
+using practica.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseSqlite(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -20,6 +22,7 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<PostIntegration>();
 builder.Services.AddScoped<FeedbackIntegration, FeedbackIntegration>();
+builder.Services.AddScoped<FeedbackService>();
 
 var app = builder.Build();
 

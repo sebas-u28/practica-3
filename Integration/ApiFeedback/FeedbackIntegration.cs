@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using practica.Models;
+using practica.Service;
 
 namespace practica.Integration
 {
@@ -12,11 +13,17 @@ namespace practica.Integration
     {
         private readonly ILogger<FeedbackIntegration> _logger;
         private readonly HttpClient _httpClient;
+        private readonly FeedbackService _feedbackService; // 👈 nueva dependencia
 
-        public FeedbackIntegration(ILogger<FeedbackIntegration> logger, HttpClient httpClient)
+
+        public FeedbackIntegration(
+            ILogger<FeedbackIntegration> logger,
+            HttpClient httpClient,
+            FeedbackService feedbackService) // 👈 inyéctalo aquí
         {
             _logger = logger;
             _httpClient = httpClient;
+            _feedbackService = feedbackService;
         }
 
         // Obtener todos los feedbacks (GET api/feedback)
@@ -71,5 +78,10 @@ namespace practica.Integration
                 return false;
             }
         }
+        public async Task<bool> FeedbackExistsAsync(int postId)
+        {
+            return await _feedbackService.FeedbackExistsAsync(postId);
+        }
+
     }
 }
