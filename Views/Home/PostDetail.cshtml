@@ -21,13 +21,25 @@
     }
 
     <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button style="padding: 10px 20px; background-color: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            👍 Me gustó
-        </button>
-        <button style="padding: 10px 20px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            👎 No me gustó
-        </button>
+        <!-- Formulario para "Me gustó" -->
+        <form method="post" asp-action="SendFeedback" asp-controller="Home" style="display:inline;">
+            <input type="hidden" name="postId" value="@Model.Post.Id" />
+            <input type="hidden" name="sentimiento" value="MeGusto" />
+            <button type="submit" style="padding: 10px 20px; background-color: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                👍 Me gustó
+            </button>
+        </form>
+
+        <!-- Formulario para "No me gustó" -->
+        <form method="post" asp-action="SendFeedback" asp-controller="Home" style="display:inline;">
+            <input type="hidden" name="postId" value="@Model.Post.Id" />
+            <input type="hidden" name="sentimiento" value="NoMeGusto" />
+            <button type="submit" style="padding: 10px 20px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                👎 No me gustó
+            </button>
+        </form>
     </div>
+
     <hr />
 
     <h3 style="color: #34495e;">Comentarios</h3>

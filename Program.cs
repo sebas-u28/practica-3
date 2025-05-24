@@ -16,6 +16,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddHttpClient(); 
 
 builder.Services.AddScoped<PostIntegration>();
 builder.Services.AddScoped<FeedbackIntegration, FeedbackIntegration>();

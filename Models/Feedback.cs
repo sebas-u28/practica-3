@@ -21,9 +21,10 @@ namespace practica.Models
         public DateTime Fecha { get; set; } = DateTime.UtcNow;
     }
 
-    public enum SentimientoTipo
-    {
-        Like,
-        Dislike
-    }
+public enum SentimientoTipo
+{
+    MeGusto,
+    NoMeGusto
+}
+
 }
