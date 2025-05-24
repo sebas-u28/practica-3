@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using practica.Data;
+using practica.Integration;
 using practica.Integration.Exchange;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,7 @@ builder.Services.AddControllersWithViews();
 
 
 builder.Services.AddScoped<PostIntegration>();
+builder.Services.AddScoped<FeedbackIntegration, FeedbackIntegration>();
 
 var app = builder.Build();
 

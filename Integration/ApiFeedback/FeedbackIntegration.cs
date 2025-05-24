@@ -1,33 +1,43 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using practica.Models;
-using practica.Service;
 
 namespace practica.Integration
 {
     public class FeedbackIntegration
     {
         private readonly ILogger<FeedbackIntegration> _logger;
-        private readonly FeedbackService _feedbackService;
+        private readonly HttpClient _httpClient;
 
-        public FeedbackIntegration(ILogger<FeedbackIntegration> logger, FeedbackService feedbackService)
+        public FeedbackIntegration(ILogger<FeedbackIntegration> logger, HttpClient httpClient)
         {
             _logger = logger;
-            _feedbackService = feedbackService;
+            _httpClient = httpClient;
         }
 
-        // Obtener todos los feedbacks
+        // Obtener todos los feedbacks (GET api/feedback)
         public async Task<List<Feedback>> GetAllFeedbacksAsync()
         {
             try
             {
-                _logger.LogInformation("Fetching feedbacks from service...");
-                var feedbacks = await _feedbackService.GetAll();
+                _logger.LogInformation("Fetching feedbacks from API...");
+                var response = await _httpClient.GetAsync("api/feedback");
 
-                _logger.LogInformation("Feedbacks retrieved: {Count}", feedbacks?.Count ?? 0);
-                return feedbacks ?? new List<Feedback>();
+                if (response.IsSuccessStatusCode)
+                {
+                    var feedbacks = await response.Content.ReadFromJsonAsync<List<Feedback>>();
+                    _logger.LogInformation("Feedbacks retrieved: {Count}", feedbacks?.Count ?? 0);
+                    return feedbacks ?? new List<Feedback>();
+                }
+                else
+                {
+                    _logger.LogError("Failed to fetch feedbacks. Status code: {StatusCode}", response.StatusCode);
+                    return new List<Feedback>();
+                }
             }
             catch (Exception ex)
             {
@@ -36,28 +46,28 @@ namespace practica.Integration
             }
         }
 
-        // Crear un nuevo feedback
+        // Crear un nuevo feedback (POST api/feedback)
         public async Task<bool> PostFeedbackAsync(Feedback feedback)
         {
             try
             {
-                _logger.LogInformation("Adding feedback for PostId {PostId} with Sentimiento {Sentimiento}", feedback.PostId, feedback.Sentimiento);
-                var success = await _feedbackService.Add(feedback);
+                _logger.LogInformation("Posting feedback for PostId {PostId} with Sentimiento {Sentimiento}", feedback.PostId, feedback.Sentimiento);
+                var response = await _httpClient.PostAsJsonAsync("api/feedback", feedback);
 
-                if (success)
+                if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("Feedback added successfully");
+                    _logger.LogInformation("Feedback posted successfully");
+                    return true;
                 }
                 else
                 {
-                    _logger.LogError("Failed to add feedback");
+                    _logger.LogError("Failed to post feedback. Status code: {StatusCode}", response.StatusCode);
+                    return false;
                 }
-
-                return success;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while adding feedback");
+                _logger.LogError(ex, "Exception occurred while posting feedback");
                 return false;
             }
         }
